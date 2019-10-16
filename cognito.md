@@ -1,4 +1,4 @@
-== Cognito Overview ==
+# Cognito Overview
 
 Cognito provides developers with an authentication, authorization and user management system that can be implemented in web applications. Cognito is divided in two main components: User Pools<ref>Amazon Cognito User Pool https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-identity-pools.html</ref> and Identity Pools<ref>Amazon Cognito Identity Pools https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-identity.html</ref>. The Amazon documentation on Cognito states that:
 
