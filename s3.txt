@@ -1,0 +1,192 @@
+== Simple Storage Service (S3) Overview ==
+Simple Storage Service (S3) is among the most popular<ref>The Most Popular AWS Products of 2018 https://www.clickittech.com/aws/top-10-aws-services/</ref><ref>Top 10 AWS services you should know about (2019 Edition) https://www.2ndwatch.com/blog/popular-aws-products-2018/</ref> of the AWS services and provides a scalable solution for objects storage via web APIs<ref>Amazon S3 - Wikipedia https://en.wikipedia.org/wiki/Amazon_S3</ref>. S3 buckets can be employed for many different usage and in many different scenarios.
+<br>
+The security of S3 buckets narrows down to an Access Control List (ACL)<ref>S3 Access Control List (ACL) https://docs.aws.amazon.com/AmazonS3/latest/dev/acl-overview.html</ref> that defines access to buckets and objects.
+
+=== S3 prerequisite ===
+Before getting started with the actual identification of S3 buckets, it is important to give a little background on S3 nomenclature:
+* a bucket is a container of objects;
+* objects are contained in S3 buckets and are essentially files;
+* when creating a bucket, it is possible to specify its region i.e. in which part of the world the bucket will be physically located.
+
+S3 buckets have unique names, meaning that two different users cannot have a bucket with the same name.
+
+Assuming a bucket named <code>mybucket</code>, it is possible to access the bucket via the following URLs:
+
+<pre>
+https://s3-[region].amazonaws.com/[bucketname]/
+</pre>
+Where <code>[region]</code> depends on the one selected during bucket creation.
+
+<pre>
+https://[bucketname].s3.amazonaws.com/
+</pre>
+
+S3 also provides the possibility of hosting static HTML content thus making an S3 bucket behaving as a static HTML web server. If this option is selected for a bucket, the following URL can be used to access the HTML code contained in that bucket:
+
+<pre>
+https://[bucketname].s3-website-[region].amazonaws.com/
+</pre>
+
+=== Identifying S3 buckets ===
+The first step when testing a web application that makes use of AWS S3 buckets is identifying the bucket(s) itself, meaning the URL that can be used to interact with the bucket.
+'''Note:''' it is not necessary to know the region of a S3 bucket to identify it. Once the name is found, it is possible to cicle 
+
+==== HTML Inspection ====
+The web application might expose the URL to the S3 bucket directly within the HTML code. To search for S3 bucket within HTML code, inspect the code in search of sub-string such as:
+<pre>
+s3.amazonaws
+amazonaws
+</pre>
+
+==== Brute force \ Educated guessing ====
+A brute-force approach, possibly based on a word-list of common words along with specific words coming from the domain under testing, might be useful in identifying S3 buckets. 
+As described in [...], S3 buckets are identified by a predefined and predictable schema that can be useful for buckets identification. By means of an automatic tool it is possible to test multiple URLs in search of S3 buckets starting from a word-list.
+
+In OWASP ZAP (v2.7.0) the fuzzer feature can be used for testing:
+# With OWASP ZAP up and running, navigate to <code>https://s3.amazonaws.com/bucket</code> to generate a request to <code>https://s3.amazonaws.com/bucket</code> in the <code>Sites</code> panel;
+# From the <code>Sites</code> panel, right click on the GET request and select <code>Attack -> Fuzz</code> to configure the fuzzer;
+# Select the word <code>bucket</code> from the request to tell the fuzzer to fuzz in that location;
+# Click <code>Add</code> and <code>Add</code> again to specify the payload the fuzzer will use;
+# Select the type of payload, which could be a list of string given to ZAP itself or loaded from a file;
+# Finally, press <code>Add</code> to add the payload, <code>Ok</code> to confirm the setting and <code>Start Fuzzer</code> to star fuzzing.
+
+If a bucket is found, ZAP will show a response with status code <code>301 Moved Permanently</code> on the other hand, if the bucket does not exist, the response status will be <code>404 Not Found</code>.
+
+==== Google Dork ====
+Google Dork<ref>Google Hacking - Wikipedia https://en.wikipedia.org/wiki/Google_hacking</ref> can also be used to search for S3 buckets URLs. The <code>Inurl</code> directive provided by Google can be used to search for S3 buckets. For example, the <code>Inurl</code> directive can be used to search for common names as shown in the following list:
+
+<pre>
+Inurl: s3.amazonaws.com/legacy/
+Inurl: s3.amazonaws.com/uploads/
+Inurl: s3.amazonaws.com/backup/
+Inurl: s3.amazonaws.com/mp3/
+Inurl: s3.amazonaws.com/movie/
+Inurl: s3.amazonaws.com/video/
+inurl: s3.amazonaws.com
+</pre>
+
+More Google Dorks<ref>Google hacking Amazon Web Services Cloud front and S3 https://it.toolbox.com/blogs/rmorril/google-hacking-amazon-web-services-cloud-front-and-s3-011613</ref> can be used for S3 buckets identification.
+
+==== Bing reverse IP ====
+Microsoft's Bing search engine can be helpful in identifying S3 buckets thanks to its feature of searching domains given an IP address. Given the IP address of a known S3 end-point, the ip:[IP] feature of Bing can be used to retrieve other S3 buckets resolving to the same IP.
+
+==== DNS Caching ====
+There are many services that maintain a DNS cache that can be queried by users to find domain names correspondence from IP address and vice versa. By taking advantage of such services it is possible to identify S3 buckets. The following list shows some services worth noting:
+
+<pre>
+https://findsubdomains.com/
+https://www.robtex.com/
+https://buckets.grayhatwarfare.com/ (created specifically to collect AWS S3 buckets)
+</pre>
+
+The following is a screenshot from https://findsubdomains.com showing how it is possible to retrieve S3 buckets by searching for subdomains of <code>s3.amazonaws.com</code>.
+
+=== S3 buckets permissions ===
+
+An S3 bucket provides a set of five permissions that can be granted at the bucket level or at the object level.
+S3 buckets permissions can be tested via two means: HTTP request or by using the <code>aws</code> command line tool.
+
+<code>READ</code>
+
+At bucket level allows the to list the objects in the bucket.</br>
+At object level allows to read the content as well as the metadata of the object.
+
+<code>WRITE</code>
+
+At bucket level allows to create, overwrite, and delete objects in the bucket.</br>
+At object level allows to edit the object itself.
+
+<code>READ_ACP</code>
+
+At bucket level allows to read the bucket’s Access Control List.</br>
+At object level allows to read the object’s Access Control List.
+
+<code>WRITE_ACP</code>
+
+At bucket level allows to set the Access Control List for the bucket.</br>
+At object level allows to set an Acess Control List for the object.
+
+<code>FULL_CONTROL</code>
+
+At bucket level is equivalent to granting the <code>READ</code>, <code>WRITE</code>, <code>READ_ACP</code>, and <code>WRITE_ACP</code> permissions.</br>
+At the object  levelis equivalent to granting the <code>READ</code>, <code>WRITE</code>, <code>READ_ACP</code>, and <code>WRITE_ACP</code>.
+
+==== <code>READ</code> Permission ====
+Via HTTP, try to access the bucket by requesting the following URL:
+<pre>
+https://[bucketname].s3.amazonaws.com
+</pre>
+It is also possible to use the <code>aws</code><ref><code>aws s3 ls</code> documentation https://docs.aws.amazon.com/cli/latest/reference/s3/ls.html</ref> command line tool to list the content of a bucket:
+<pre>aws s3 ls s3://[bucketname] --no-sign-request</pre>
+'''Note:''' the <code>-no-sign-request</code> flag specifies to not use credential to sign the request.
+
+==== <code>WRITE</code> Permission ====
+Via the <code>aws</code> command line tool it is possible to write to a bucket <ref><code>aws cp</code> documentation https://docs.aws.amazon.com/cli/latest/reference/s3/cp.html</ref> line:
+<pre>
+aws s3 cp localfile s3://[bucketname]/file.txt --no-sign-request
+</pre>
+A bucket that allows arbitrary file upload will answer with a message showing that the file has been uploaded, such as the following:
+<pre>
+upload: Pictures/ec2-s3.png to s3://mindeds3test01/file.txt
+</pre>
+'''Note:''' the <code>-no-sign-request</code> flag specifies to not use credential to sign the request.
+
+==== <code>READ_ACL</code> Permission ====
+Via the <code>aws</code> command line tool it is possible to test <code>READ_ACL</code> for both an S3 bucket<ref><code>aws s3api get-bucket-acl</code> documentation https://docs.aws.amazon.com/cli/latest/reference/s3api/get-bucket-acl.html</ref> and single objects<ref><code>aws s3api get-object-acl</code> documentation https://docs.aws.amazon.com/cli/latest/reference/s3api/get-object-acl.html</ref>.
+
+Testing bucket for <code>READ_ACL</code>:
+
+<pre>
+aws s3api get-bucket-acl --bucket [bucketname] --no-sign
+</pre>
+
+Testing single object for <code>READ_ACL</code>:
+<pre>
+aws s3api get-object-acl --bucket [bucketname] --key index.html --no-sign-request
+</pre>
+
+Both commands will output a JSON showing the ACL policies for the specified resource.
+
+'''Note:''' the <code>-no-sign-request</code> flag specifies to not use credential to sign the request.
+
+==== <code>WRITE_ACL</code> Permission ====
+Via AWS command line it is possible to test <code>WRITE_ACL</code> for both an S3 bucket<ref><code>aws s3api put-bucket-acl</code> https://docs.aws.amazon.com/cli/latest/reference/s3api/put-bucket-acl.html</ref> and single objects<ref><code>aws s3api put-object-acl</code> https://docs.aws.amazon.com/cli/latest/reference/s3api/put-object-acl.html</ref>.
+
+Testing bucket for <code>WRITE_ACL</code>:
+
+<pre>
+aws s3api put-bucket-acl --bucket [bucketname] [ACLPERMISSIONS] --no-sign-request
+</pre>
+
+Testing single object for <code>WRITE_ACL</code>:
+<pre>
+aws s3api put-object-acl --bucket [bucketname] --key file.txt [ACLPERMISSIONS] --no-sign-request
+</pre>
+
+Both commands do not display an output in case of operation successful.
+
+'''Note:''' the <code>-no-sign-request</code> flag specifies to not use credential to sign the request.
+
+==== Any authenticated AWS client ====
+Finally, S3 permissions used to include a peculiar grant named "any authenticated AWS client". This permission allows any AWS member, regardless of who they are, access to the bucket. This feature is not provided anymore but there are still buckets with this permission enabled.
+To test for this type of permission, create an AWS account and configure it locally with the <code>aws</code> command line:
+
+<pre>
+aws configure
+</pre>
+
+Try to access the bucket with the same commands described above, the only difference is that the flag <code>--no-sign-request</code> should be replaced with <code>--profile [PROFILENAME]</code> where <code>[PROFILENAME]</code> is the name of the profile created with the <code>configure</code> command.
+
+== External Resources ==
+This is a collection of additional external resources related to testing S3 buckets.
+
+* My arsenal of AWS security tools (https://blyx.com/2018/07/18/my-arsenal-of-aws-security-tools/)
+* My Arsenal of Cloud Native (Security) Tools (https://www.marcolancini.it/2018/blog-arsenal-cloud-native-security-tools/)
+* AWS Security Checks (https://github.com/PortSwigger/aws-security-checks)
+* boto: A Python interface to Amazon Web Services (http://boto.cloudhackers.com/en/latest/)
+* AWS Extender (https://github.com/VirtueSecurity/aws-extender)
+* RhinoSecurityLabs aws-pentest-tools (https://github.com/RhinoSecurityLabs/Security-Research/tree/master/tools/aws-pentest-tools)
+
+== References ==
+
