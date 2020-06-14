@@ -30,7 +30,7 @@ For this reason, The CSTG combines comprehensive, objective technical processese
 
 ## Amazon AWS Testing Guide
 
-- [Platform Overview](Document/0x03a-Platform-Overview.md)
+- [Platform Overview](Document/0x02a-Platform-Overview.md)
 - [Basic Security Testing]()
 - [Access Methods]()
 - [Resource Inventory]()
