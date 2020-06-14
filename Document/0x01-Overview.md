@@ -65,8 +65,8 @@ From a testing perspective, almost all of the tools that have been designed to a
 
 The CSTG contains the following main sections:
 
-1. The [Amazon Web Services Testing Guide](0x04a-Mobile-App-Taxonomy.md) covers  Amazon Web Services testing methodologies and cloud service provider overview and security best-practices.
+1. The [Amazon Web Services Testing Guide]() covers  Amazon Web Services testing methodologies and cloud service provider overview and security best-practices.
 
-2. The [Microsoft Azure Testing Guide](0x05a-Platform-Overview.md) covers  Microsoft Azure testing methodologies and cloud service provider overview and security best-practices.
+2. The [Microsoft Azure Testing Guide]() covers  Microsoft Azure testing methodologies and cloud service provider overview and security best-practices.
 
-3. The [Google Cloud Testing Guide](0x06a-Platform-Overview.md) covers  Google Cloud Platform testing methodologies and cloud service provider overview and security best-practices.
+3. The [Google Cloud Testing Guide]() covers  Google Cloud Platform testing methodologies and cloud service provider overview and security best-practices.
